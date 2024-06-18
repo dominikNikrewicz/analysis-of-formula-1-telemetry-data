@@ -21,5 +21,7 @@ Install the required packages using pip:
 
 ```sh
 pip install fastf1 numpy matplotlib seaborn mplcyberpunk pandas timple
+```
 
+## Author
 This project was created by Dominik Nikrewicz. You can contact me at dominik.nikrewicz@gmail.com
