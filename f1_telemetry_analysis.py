@@ -16,8 +16,7 @@ from matplotlib import cm
 from matplotlib.colors import to_rgba
 from fastf1.ergast import Ergast
 
-
-# predkosc kierowcy na najszybszym okrazeniu
+# Function to get the speed telemetry of a driver on their fastest lap
 def get_speed_telemetry(year, event_name, driver, ses):
     colormap = mpl.cm.plasma
     session = ff1.get_session(year, event_name, ses)
@@ -33,7 +32,7 @@ def get_speed_telemetry(year, event_name, driver, ses):
     fig, ax = plt.subplots(sharex=True, sharey=True, figsize=(12, 6.75))
     fig.suptitle(f'{year} {session.event["EventName"]} - {driver} - Speed', size=24, y=0.97)
 
-    # Adjust margins and turn of axis
+    # Adjust margins and turn off axis
     plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.12)
     ax.axis('off')
 
@@ -42,13 +41,14 @@ def get_speed_telemetry(year, event_name, driver, ses):
     lc = LineCollection(segments, cmap=colormap, norm=norm, linestyle='-', linewidth=5)
     lc.set_array(color)
 
+    # Add colorbar
     cbaxes = fig.add_axes([0.25, 0.05, 0.5, 0.05])
     normlegend = mpl.colors.Normalize(vmin=color.min(), vmax=color.max())
     legend = mpl.colorbar.ColorbarBase(cbaxes, norm=normlegend, cmap=colormap, orientation="horizontal")
     plt.show()
 
 
-# prędkość kierowcy na najszybszym okrążeniu wraz z oznaczeniami zakrętów
+# Function to get the speed telemetry with corner annotations
 def get_speed_traces_with_corner_annotations(year, event_name, driver, ses):
     fastf1.plotting.setup_mpl(misc_mpl_mods=False)
 
@@ -81,7 +81,7 @@ def get_speed_traces_with_corner_annotations(year, event_name, driver, ses):
     plt.show()
 
 
-# porownanie predkosci dwoch kierowcow na najszybszym okrazeniu  w danej sesji
+# Function to compare the speeds of two drivers on their fastest laps
 def overlaying_speed_traces_of_two_drivers(year, event_name, driver1, driver2, ses):
     plt.style.use("cyberpunk")
     session = fastf1.get_session(year, event_name, ses)
@@ -108,13 +108,14 @@ def overlaying_speed_traces_of_two_drivers(year, event_name, driver1, driver2, s
     ax.set_ylabel('Speed in km/h')
     ax.legend()
     plt.title(f"Fastest Lap Comparison {driver1} and {driver2}\n "
-                 f"{session.event['EventName']} {session.event.year} {session.name}\n"
+              f"{session.event['EventName']} {session.event.year} {session.name}\n"
               f"{driver1}: {strftimedelta(session.laps.pick_driver(driver1).pick_fastest()['LapTime'], '%m:%s.%ms')}\n"
               f"{driver2}: {strftimedelta(session.laps.pick_driver(driver2).pick_fastest()['LapTime'], '%m:%s.%ms')}\n")
 
     plt.show()
 
 
+# Function to compare the RPM traces of two drivers
 def overlaying_rpm_traces_of_two_drivers(year, event_name, driver1, driver2, ses):
     fastf1.plotting.setup_mpl(misc_mpl_mods=False)
     session = fastf1.get_session(year, event_name, ses)
@@ -138,16 +139,17 @@ def overlaying_rpm_traces_of_two_drivers(year, event_name, driver1, driver2, ses
         ax.text(corner['Distance'], 70, txt,
                 va='center_baseline', ha='center', size='small')
     ax.set_xlabel('Distance in m')
-    ax.set_ylabel('Speed in km/h')
+    ax.set_ylabel('RPM')
     ax.legend()
     plt.title(f"RPM comparison {driver1} and {driver2}\n "
               f"{session.event['EventName']} {session.event.year} {session.name}")
     plt.show()
 
 
+# Function to compare the throttle pressure of two drivers
 def comparison_of_throttle_pressure_for_two_drivers(year, event_name, driver1, driver2, ses):
     plt.style.use("cyberpunk")
-    # load a session and its telemetry data
+    # Load a session and its telemetry data
     session = fastf1.get_session(year, event_name, ses)
     session.load()
     driver1_lap = session.laps.pick_driver(driver1).pick_fastest()
@@ -176,8 +178,9 @@ def comparison_of_throttle_pressure_for_two_drivers(year, event_name, driver1, d
     plt.show()
 
 
+# Function to compare the gear usage of two drivers
 def comparison_of_gear_number_for_two_drivers(year, event_name, drivers, ses):
-    # load a session and its telemetry data
+    # Load a session and its telemetry data
     session = fastf1.get_session(year, event_name, ses)
     session.load()
     plt.style.use("cyberpunk")
@@ -201,16 +204,17 @@ def comparison_of_gear_number_for_two_drivers(year, event_name, drivers, ses):
     ax.set_ylabel('Gear')
     ax.legend()
 
-    plt.title(f"Comparison of brake pressure for {drivers} and {drivers}\n "
+    plt.title(f"Comparison of gear usage for {drivers}\n "
               f"{session.event['EventName']} {session.event.year} {session.name}")
 
     plt.show()
 
 
+# Function to compare the brake pressure of two drivers
 def comparison_of_brake_pressure_for_two_drivers(year, event_name, driver1, driver2, ses):
     fastf1.plotting.setup_mpl(misc_mpl_mods=False)
 
-    # load a session and its telemetry data
+    # Load a session and its telemetry data
     session = fastf1.get_session(year, event_name, ses)
     session.load()
     driver1_lap = session.laps.pick_driver(driver1).pick_fastest()
@@ -239,6 +243,7 @@ def comparison_of_brake_pressure_for_two_drivers(year, event_name, driver1, driv
     plt.show()
 
 
+# Function to get the positions gained on the first lap of a race
 def get_gained_positions_on_first_lap(year, event_name):
     gained_positions = {}
     gaining_position_sum = {}
@@ -255,7 +260,7 @@ def get_gained_positions_on_first_lap(year, event_name):
             if not grid_position.empty and not position_after_first_lap.empty:
                 gained_positions1 = int(grid_position.iloc[0]) - int(position_after_first_lap.iloc[0])
             else:
-                # handle the case when one or both DataFrames are empty
+                # Handle the case when one or both DataFrames are empty
                 print("Error: DataFrames are empty.")
             gained_positions[driver] = gained_positions1
             if driver not in gaining_position_sum:
@@ -263,7 +268,7 @@ def get_gained_positions_on_first_lap(year, event_name):
             gaining_position_sum[driver][0] += gained_positions[driver]
             gaining_position_sum[driver][1] += 1
         else:
-            print(f"{event_name} kierowca o numerze {driver} rusza z alei serwisowej")
+            print(f"{event_name} driver with number {driver} starts from the pit lane")
     sorted_driver_times = dict(sorted(gained_positions.items(), key=operator.itemgetter(1)))
 
     sorted_driver_times_names = list()
@@ -285,19 +290,20 @@ def get_gained_positions_on_first_lap(year, event_name):
     ax.set_yticks(df.index)
     ax.set_yticklabels(sorted_driver_times_names)
 
-    # show fastest at the top
+    # Show fastest at the top
     ax.invert_yaxis()
 
-    # draw vertical lines behind the bars
+    # Draw vertical lines behind the bars
     ax.set_axisbelow(True)
     ax.xaxis.grid(True, which='major', linestyle='--', color='black', zorder=-1000)
 
-    plt.xlabel('Zyskane pozycje')
-    plt.ylabel('Kierowcy')
-    plt.title(f"Zyskane pozycje w {session.session_info['Meeting']['Name']} {year}")
+    plt.xlabel('Positions gained')
+    plt.ylabel('Drivers')
+    plt.title(f"Positions gained in {session.session_info['Meeting']['Name']} {year}")
     plt.show()
 
 
+# Function to get the positions gained on the first lap and display it on an existing axis
 def get_gained_positions_on_first_lap_wall(session, ax=None):
     gained_positions = {}
     gaining_position_sum = {}
@@ -310,7 +316,7 @@ def get_gained_positions_on_first_lap_wall(session, ax=None):
             if not grid_position.empty and not position_after_first_lap.empty:
                 gained_positions1 = int(grid_position.iloc[0]) - int(position_after_first_lap.iloc[0])
             else:
-                # handle the case when one or both DataFrames are empty
+                # Handle the case when one or both DataFrames are empty
                 print("Error: DataFrames are empty.")
             gained_positions[driver] = gained_positions1
             if driver not in gaining_position_sum:
@@ -318,7 +324,7 @@ def get_gained_positions_on_first_lap_wall(session, ax=None):
             gaining_position_sum[driver][0] += gained_positions[driver]
             gaining_position_sum[driver][1] += 1
         else:
-            print(f"{session.session_info['Meeting']['Name']} kierowca o numerze {driver} rusza z alei serwisowej")
+            print(f"{session.session_info['Meeting']['Name']} driver with number {driver} starts from the pit lane")
     sorted_driver_times = dict(sorted(gained_positions.items(), key=operator.itemgetter(1)))
 
     sorted_driver_times_names = list()
@@ -339,10 +345,10 @@ def get_gained_positions_on_first_lap_wall(session, ax=None):
     ax.set_yticks(df.index)
     ax.set_yticklabels(sorted_driver_times_names)
 
-    # show fastest at the top
+    # Show fastest at the top
     ax.invert_yaxis()
 
-    # draw vertical lines behind the bars
+    # Draw vertical lines behind the bars
     ax.set_axisbelow(True)
     ax.xaxis.grid(True, which='major', linestyle='--', color='black', zorder=-1000)
 
@@ -352,6 +358,7 @@ def get_gained_positions_on_first_lap_wall(session, ax=None):
     return ax
 
 
+# Function to get the positions gained in a full race
 def get_gained_positions_in_full_race(year, event_name):
     gained_positions = {}
     gaining_position_sum = {}
@@ -373,7 +380,7 @@ def get_gained_positions_in_full_race(year, event_name):
             gaining_position_sum[driver][0] += gained_positions[driver]
             gaining_position_sum[driver][1] += 1
         else:
-            print(f"{event_name} kierowca o numerze {driver} rusza z alei serwisowej")
+            print(f"{event_name} driver with number {driver} starts from the pit lane")
     sorted_driver_times = dict(sorted(gained_positions.items(), key=operator.itemgetter(1)))
     results = session.results
     team_colors = list()
@@ -395,18 +402,19 @@ def get_gained_positions_in_full_race(year, event_name):
     ax.set_yticks(df.index)
     ax.set_yticklabels(sorted_driver_times_names)
 
-    # show fastest at the top
+    # Show fastest at the top
     ax.invert_yaxis()
 
-    # draw vertical lines behind the bars
+    # Draw vertical lines behind the bars
     ax.set_axisbelow(True)
     ax.xaxis.grid(True, which='major', linestyle='--', color='black', zorder=-1000)
-    plt.xlabel('Zyskane pozycje')
-    plt.ylabel('Kierowcy')
-    plt.title(f'Zyskane pozycje w {session.session_info["Meeting"]["Name"]} {year}')
+    plt.xlabel('Positions gained')
+    plt.ylabel('Drivers')
+    plt.title(f'Positions gained in {session.session_info["Meeting"]["Name"]} {year}')
     plt.show()
 
 
+# Function to get the positions gained in a full race and display it on an existing axis
 def get_gained_positions_in_full_race_wall(session, ax=None):
     gained_positions = {}
     gaining_position_sum = {}
@@ -426,7 +434,7 @@ def get_gained_positions_in_full_race_wall(session, ax=None):
             gaining_position_sum[driver][0] += gained_positions[driver]
             gaining_position_sum[driver][1] += 1
         else:
-            print(f"{session.session_info['Meeting']['Name']} kierowca o numerze {driver} rusza z alei serwisowej")
+            print(f"{session.session_info['Meeting']['Name']} driver with number {driver} starts from the pit lane")
     sorted_driver_times = dict(sorted(gained_positions.items(), key=operator.itemgetter(1)))
     results = session.results
     team_colors = list()
@@ -447,10 +455,10 @@ def get_gained_positions_in_full_race_wall(session, ax=None):
     ax.set_yticks(df.index)
     ax.set_yticklabels(sorted_driver_times_names)
 
-    # show fastest at the top
+    # Show fastest at the top
     ax.invert_yaxis()
 
-    # draw vertical lines behind the bars
+    # Draw vertical lines behind the bars
     ax.set_axisbelow(True)
     ax.xaxis.grid(True, which='major', linestyle='--', color='black', zorder=-1000)
 
@@ -460,6 +468,7 @@ def get_gained_positions_in_full_race_wall(session, ax=None):
     return ax
 
 
+# Function to visualize the position changes during the race
 def visualization_of_position_changes_during_the_race(year, event_name):
     fastf1.plotting.setup_mpl(misc_mpl_mods=False)
     session = fastf1.get_session(year, event_name, 'R')
@@ -480,10 +489,11 @@ def visualization_of_position_changes_during_the_race(year, event_name):
     ax.set_ylabel('Position')
     ax.legend(bbox_to_anchor=(1.0, 1.0))
     plt.tight_layout()
-    plt.suptitle(f'Zmiana pozycji na przestrzeni wyścigu {session.session_info["Meeting"]["Name"]} {year}')
+    plt.suptitle(f'Position changes during the race {session.session_info["Meeting"]["Name"]} {year}')
     plt.show()
 
 
+# Function to visualize the position changes during the race and display it on an existing axis
 def visualization_of_position_changes_during_the_race_wall(session, ax=None):
     for drv in session.drivers:
         drv_laps = session.laps.pick_driver(drv)
@@ -502,15 +512,16 @@ def visualization_of_position_changes_during_the_race_wall(session, ax=None):
     return ax
 
 
+# Function to get the times for a 0 to X speed test
 def get_0_x_times(year, event_name, speed):
     fastf1.plotting.setup_mpl(mpl_timedelta_support=False, misc_mpl_mods=False)
     session = fastf1.get_session(year, event_name, 'R')
     session.load()
     times_0_200 = {}
     for driver in session.drivers:
-        # Pobranie pierwszego okrążenia dla każdego kierowcy
+        # Get the first lap for each driver
         first_lap = session.laps.pick_driver(driver).pick_laps(1).get_telemetry()
-        # Przefiltrowanie danych odnośnie startu 0-200km/h
+        # Filter data for 0-200 km/h start
         filtered_lap = first_lap[
             (first_lap['Time'] <= first_lap[first_lap['Speed'] >= speed]['Time'].iloc[0]) & (first_lap['Speed'] >= 0)][
             ['Speed', 'Time']]
@@ -546,10 +557,10 @@ def get_0_x_times(year, event_name, speed):
     ax.set_yticks(df.index)
     ax.set_yticklabels(sorted_driver_times_names)
 
-    # show fastest at the top
+    # Show fastest at the top
     ax.invert_yaxis()
 
-    # draw vertical lines behind the bars
+    # Draw vertical lines behind the bars
     ax.set_axisbelow(True)
     ax.xaxis.grid(True, which='major', linestyle='--', color='black', zorder=-1000)
     plt.title(f"{session.session_info['Meeting']['Name']} {year} Qualifying\n"
@@ -557,12 +568,13 @@ def get_0_x_times(year, event_name, speed):
     plt.show()
 
 
+# Function to get the times for a 0 to X speed test and display it on an existing axis
 def get_0_x_times_wall(session, speed, ax=None):
     times_0_200 = {}
     for driver in session.drivers:
-        # Pobranie pierwszego okrążenia dla każdego kierowcy
+        # Get the first lap for each driver
         first_lap = session.laps.pick_driver(driver).pick_laps(1).get_telemetry()
-        # Przefiltrowanie danych odnośnie startu 0-200km/h
+        # Filter data for 0-200 km/h start
         filtered_lap = first_lap[
             (first_lap['Time'] <= first_lap[first_lap['Speed'] >= speed]['Time'].iloc[0]) & (first_lap['Speed'] >= 0)][
             ['Speed', 'Time']]
@@ -582,7 +594,7 @@ def get_0_x_times_wall(session, speed, ax=None):
     sorted_driver_times_names = list()
     for index in sorted_driver_times:
         sorted_driver_times_names.append(results[results['DriverNumber'] == index]['Abbreviation'][0])
-        color = fastf1.plotting.team_color(results[results['DriverNumber'] == index]['TeamName'].values[0])  # wysypuje sie przy kick'u
+        color = fastf1.plotting.team_color(results[results['DriverNumber'] == index]['TeamName'].values[0])
         team_colors.append(color)
 
     best_time = round(list(sorted_driver_times.values())[0], 3)
@@ -597,10 +609,10 @@ def get_0_x_times_wall(session, speed, ax=None):
     ax.set_yticks(df.index)
     ax.set_yticklabels(sorted_driver_times_names)
 
-    # show fastest at the top
+    # Show fastest at the top
     ax.invert_yaxis()
 
-    # draw vertical lines behind the bars
+    # Draw vertical lines behind the bars
     ax.set_axisbelow(True)
     ax.xaxis.grid(True, which='major', linestyle='--', color='black', zorder=-1000)
     ax.set_xlabel('Gap')
@@ -610,7 +622,7 @@ def get_0_x_times_wall(session, speed, ax=None):
     return ax
 
 
-# Team pace comparison
+# Function for team pace comparison
 def team_pace_comparison(year, event_name):
     session = fastf1.get_session(year, event_name, 'R')
     fastf1.plotting.setup_mpl(mpl_timedelta_support=False, misc_mpl_mods=False)
@@ -620,7 +632,7 @@ def team_pace_comparison(year, event_name):
     transformed_laps = laps.copy()
     transformed_laps.loc[:, "LapTime (s)"] = laps["LapTime"].dt.total_seconds()
 
-    # order the team from the fastest (lowest median lap time) tp slower
+    # Order the team from the fastest (lowest median lap time) to slower
     team_order = (
         transformed_laps[["Team", "LapTime (s)"]]
         .groupby("Team")
@@ -629,7 +641,7 @@ def team_pace_comparison(year, event_name):
         .index
     )
 
-    # make a color palette associating team names to hex codes
+    # Make a color palette associating team names to hex codes
     team_palette = {team: fastf1.plotting.team_color(team) for team in team_order}
 
     fig, ax = plt.subplots(figsize=(15, 10))
@@ -654,13 +666,13 @@ def team_pace_comparison(year, event_name):
     plt.show()
 
 
-# Team pace comparison during session
+# Function for team pace comparison and display it on an existing axis
 def team_pace_comparison_wall(session, ax=None):
     laps = session.laps.pick_quicklaps()
     transformed_laps = laps.copy()
     transformed_laps.loc[:, "LapTime (s)"] = laps["LapTime"].dt.total_seconds()
 
-    # order the team from the fastest (lowest median lap time) tp slower
+    # Order the team from the fastest (lowest median lap time) to slower
     team_order = (
         transformed_laps[["Team", "LapTime (s)"]]
         .groupby("Team")
@@ -669,7 +681,7 @@ def team_pace_comparison_wall(session, ax=None):
         .index
     )
 
-    # make a color palette associating team names to hex codes
+    # Make a color palette associating team names to hex codes
     team_palette = {team: fastf1.plotting.team_color(team) for team in team_order}
 
     sns.boxplot(
@@ -690,7 +702,7 @@ def team_pace_comparison_wall(session, ax=None):
     return ax
 
 
-# Wizualizacja tempa 10 najlepszych kierowców w sesji
+# Visualization of lap times for the top 10 drivers in a session
 def driver_laptimes_visualization_concrete(year, event_name):
     race = fastf1.get_session(year, event_name, 'R')
     fastf1.plotting.setup_mpl(mpl_timedelta_support=False, misc_mpl_mods=False)
@@ -702,7 +714,7 @@ def driver_laptimes_visualization_concrete(year, event_name):
     driver_colors = {abv: fastf1.plotting.DRIVER_COLORS[driver] for abv,
     driver in fastf1.plotting.DRIVER_TRANSLATE.items()}
 
-    # create the figure
+    # Create the figure
     fig, ax = plt.subplots(figsize=(10, 5))
 
     driver_laps["LapTime(s)"] = driver_laps["LapTime"].dt.total_seconds()
@@ -736,7 +748,7 @@ def driver_laptimes_visualization_concrete(year, event_name):
     plt.show()
 
 
-# wizualizacja tempa pokonywania okrazen 10 najlepszych kierowcow w sesji
+# Visualization of lap times for the top 10 drivers in a session and display it on an existing axis
 def driver_laptimes_visualization_wall(year, event_name, ax=None):
     race = fastf1.get_session(year, event_name, 'R')
     fastf1.plotting.setup_mpl(mpl_timedelta_support=False, misc_mpl_mods=False)
@@ -777,7 +789,7 @@ def driver_laptimes_visualization_wall(year, event_name, ax=None):
     return ax
 
 
-# Wizualizacja stategii opon
+# Visualization of tyre strategies
 def tyre_strategies(year, event_name):
     fastf1.plotting.setup_mpl(mpl_timedelta_support=True, misc_mpl_mods=False)
 
@@ -797,8 +809,8 @@ def tyre_strategies(year, event_name):
 
         previous_stint_end = 0
         for idx, row in driver_stints.iterrows():
-            # each row contains the compound name and stint length
-            # we can use these information to draw horizontal bars
+            # Each row contains the compound name and stint length
+            # We can use this information to draw horizontal bars
             plt.barh(
                 y=driver,
                 width=row["StintLength"],
@@ -813,7 +825,7 @@ def tyre_strategies(year, event_name):
 
     plt.xlabel("Lap Number")
     plt.grid(False)
-    # invert the y-axis so drivers that finish higher are closer to the top
+    # Invert the y-axis so drivers that finish higher are closer to the top
     ax.invert_yaxis()
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
@@ -823,6 +835,7 @@ def tyre_strategies(year, event_name):
     plt.show()
 
 
+# Visualization of tyre strategies and display it on an existing axis
 def tyre_strategies_wall(session, ax=None):
     fastf1.plotting.setup_mpl(mpl_timedelta_support=True, misc_mpl_mods=False)
     laps = session.laps
@@ -838,8 +851,8 @@ def tyre_strategies_wall(session, ax=None):
 
         previous_stint_end = 0
         for idx, row in driver_stints.iterrows():
-            # each row contains the compound name and stint length
-            # we can use these information to draw horizontal bars
+            # Each row contains the compound name and stint length
+            # We can use this information to draw horizontal bars
             ax.barh(
                 y=driver,
                 width=row["StintLength"],
@@ -854,7 +867,7 @@ def tyre_strategies_wall(session, ax=None):
     ax.set_xlabel("Lap")
     ax.set_ylabel("Driver")
     ax.grid(False)
-    # invert the y-axis so drivers that finish higher are closer to the top
+    # Invert the y-axis so drivers that finish higher are closer to the top
     ax.invert_yaxis()
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
@@ -863,7 +876,7 @@ def tyre_strategies_wall(session, ax=None):
     return ax
 
 
-# Wizualizacja czasów okrążeń danego kierowcy w danej sesji
+# Visualization of lap times for a specific driver in a session
 def driver_lap_times(year, destination, driver, ses):
     fastf1.plotting.setup_mpl(misc_mpl_mods=False)
     race = fastf1.get_session(year, destination, ses)
@@ -886,9 +899,6 @@ def driver_lap_times(year, destination, driver, ses):
     ax.set_xlabel("Lap Number")
     ax.set_ylabel("Lap Time")
 
-    # The y-axis increases from bottom to top by default
-    # Since we are plotting time, it makes sense to invert the axis
-    # ax.invert_yaxis()
     plt.suptitle(f"{driver} laptimes in the {year} {race.event['EventName']}")
 
     # Turn on major grid lines
@@ -899,6 +909,7 @@ def driver_lap_times(year, destination, driver, ses):
     plt.show()
 
 
+# Visualization of qualifying results for a specific session and display it on an existing axis
 def quali_results_concrete_wall(year, event, ax=None):
     session = fastf1.get_session(year, event, 'Q')
 
@@ -915,7 +926,7 @@ def quali_results_concrete_wall(year, event, ax=None):
     fastest_laps['LapTimeDelta'] = fastest_laps['LapTime'] - pole_lap['LapTime']
     team_colors = list()
     filtered_fastest_laps = fastest_laps.dropna(subset=['Team'])
-    #  Odrzucenie z wykresu kierowców którzy stracili więcej niz 5s w celu łaniejszego wykresu
+    # Filter out drivers who lost more than 5 seconds for a cleaner plot
     filtered_fastest_laps = filtered_fastest_laps[filtered_fastest_laps['LapTimeDelta'] < pd.Timedelta(seconds=5)]
     for index, lap in filtered_fastest_laps.iterlaps():
         color = fastf1.plotting.team_color(lap['Team'])
@@ -926,10 +937,10 @@ def quali_results_concrete_wall(year, event, ax=None):
     ax.set_yticks(filtered_fastest_laps.index)
     ax.set_yticklabels(filtered_fastest_laps['Driver'])
 
-    # show fastest at the top
+    # Show fastest at the top
     ax.invert_yaxis()
 
-    # draw vertical lines behind the bars
+    # Draw vertical lines behind the bars
     ax.set_axisbelow(True)
     ax.xaxis.grid(True, which='major', linestyle='--', color='black', zorder=-1000)
 
@@ -940,6 +951,7 @@ def quali_results_concrete_wall(year, event, ax=None):
     return ax
 
 
+# Visualization of qualifying results for a specific session
 def quali_results_concrete(year, event):
     session = fastf1.get_session(year, event, 'Q')
     plt.style.use("cyberpunk")
@@ -955,8 +967,8 @@ def quali_results_concrete(year, event):
     pole_lap = fastest_laps.pick_fastest()
     fastest_laps['LapTimeDelta'] = fastest_laps['LapTime'] - pole_lap['LapTime']
     team_colors = list()
-    filtered_fastest_laps = fastest_laps.dropna(subset=['Team'])  # usuwa wszystkie NaT
-    #  Odrzucenie z wykresu kierowców którzy stracili więcej niz 5s w celu łaniejszego wykresu
+    filtered_fastest_laps = fastest_laps.dropna(subset=['Team'])  # Remove all NaT
+    # Filter out drivers who lost more than 5 seconds for a cleaner plot
     filtered_fastest_laps = filtered_fastest_laps[filtered_fastest_laps['LapTimeDelta'] < pd.Timedelta(seconds=5)]
     for index, lap in filtered_fastest_laps.iterlaps():
         color = fastf1.plotting.team_color(lap['Team'])
@@ -967,10 +979,10 @@ def quali_results_concrete(year, event):
     ax.set_yticks(filtered_fastest_laps.index)
     ax.set_yticklabels(filtered_fastest_laps['Driver'])
 
-    # show fastest at the top
+    # Show fastest at the top
     ax.invert_yaxis()
 
-    # draw vertical lines behind the bars
+    # Draw vertical lines behind the bars
     ax.set_axisbelow(True)
     ax.xaxis.grid(True, which='major', linestyle='--', color='black', zorder=-1000)
 
@@ -982,6 +994,7 @@ def quali_results_concrete(year, event):
     plt.show()
 
 
+# Function to get qualifying results for all events in a year
 def quali_results():
     event = fastf1.get_event_schedule(2023)
     for x in range(1, 23):
@@ -1002,7 +1015,7 @@ def quali_results():
         fastest_laps['LapTimeDelta'] = fastest_laps['LapTime'] - pole_lap['LapTime']
         team_colors = list()
         filtered_fastest_laps = fastest_laps.dropna(subset=['Team'])
-        #  Odrzucenie z wykresu kierowców którzy stracili więcej niz 5s w celu łaniejszego wykresu
+        # Filter out drivers who lost more than 5 seconds for a cleaner plot
         filtered_fastest_laps = filtered_fastest_laps[filtered_fastest_laps['LapTimeDelta'] < pd.Timedelta(seconds=5)]
         for index, lap in filtered_fastest_laps.iterlaps():
             color = fastf1.plotting.team_color(lap['Team'])
@@ -1013,10 +1026,10 @@ def quali_results():
         ax.set_yticks(filtered_fastest_laps.index)
         ax.set_yticklabels(filtered_fastest_laps['Driver'])
 
-        # show fastest at the top
+        # Show fastest at the top
         ax.invert_yaxis()
 
-        # draw vertical lines behind the bars
+        # Draw vertical lines behind the bars
         ax.set_axisbelow(True)
         ax.xaxis.grid(True, which='major', linestyle='--', color='black', zorder=-1000)
 
@@ -1027,6 +1040,7 @@ def quali_results():
         plt.show()
 
 
+# Function to compare the fastest laps of two drivers on a map
 def compare_fastest_lap_visualization_on_map(ses, year, driver1, driver2, identifier, ax=None):
     laps = ses.laps
     laps_driver1 = laps.pick_driver(driver1)
@@ -1072,7 +1086,7 @@ def compare_fastest_lap_visualization_on_map(ses, year, driver1, driver2, identi
     fastest_driver = fastest_driver[['Minisector', 'Driver']].rename(columns={'Driver': 'Fastest_driver'})
     # Join the fastest driver per minisector with the full telemetry
     telemetry = telemetry.merge(fastest_driver, on=['Minisector'])
-    # Order the data by distance to make matploblib does not get confused
+    # Order the data by distance to make matplotlib does not get confused
     telemetry = telemetry.sort_values(by=['Distance'])
     # Convert driver name to integer
     telemetry.loc[telemetry['Fastest_driver'] == driver1, 'Fastest_driver_int'] = 1
@@ -1114,10 +1128,11 @@ def compare_fastest_lap_visualization_on_map(ses, year, driver1, driver2, identi
     cbar.set_ticks(np.arange(1.5, 3.5))
     cbar.set_ticklabels([driver1, driver2])
     ax.set_title(f"{ses.session_info['Meeting']['Name']} {year} {identifier}\n"
-              f"Comparision {driver1} with {driver2}")
+                 f"Comparison {driver1} with {driver2}")
     return ax
 
 
+# Function to create a wall of plots for comparison
 def wall_of_plots(year, event_name, driver_1, driver_2, ses):
     quali = ff1.get_session(year, event_name, ses)
     quali.load()
@@ -1139,7 +1154,7 @@ def wall_of_plots(year, event_name, driver_1, driver_2, ses):
     telemetry_driver_1 = fastest_driver_1.get_telemetry().add_distance()
     telemetry_driver_2 = fastest_driver_2.get_telemetry().add_distance()
 
-    # Make sure whe know the team name for coloring
+    # Make sure we know the team name for coloring
     team_driver_1 = fastest_driver_1['Team']
     team_driver_2 = fastest_driver_2['Team']
     delta_time, ref_tel, compare_tel = utils.delta_time(fastest_driver_1, fastest_driver_2, )
@@ -1147,7 +1162,7 @@ def wall_of_plots(year, event_name, driver_1, driver_2, ses):
     plot_size = [20, 100]
     plot_title = f"{quali.event.year} {quali.event.EventName} - {quali.name} - {driver_1} VS {driver_2}"
     plot_ratios = [3, 3, 3, 3, 3, 3, 3, 5, 4, 4, 4, 4, 4]
-    plot_filename = "wersja_cyberpunkowa"
+    plot_filename = "cyberpunk_version"
     # Make plot a bit bigger
     plt.rcParams['figure.figsize'] = plot_size
     # Create subplots with different sizes
@@ -1163,7 +1178,7 @@ def wall_of_plots(year, event_name, driver_1, driver_2, ses):
     # Set the plot title
     ax[0].title.set_text(plot_title)
     # Delta line
-    # change plot colour to yellow
+    # Change plot color to yellow
     ax[0].plot(ref_tel['Distance'], delta_time, label=driver_1, color=ff1.plotting.team_color(team_driver_1))
     ax[0].plot(ref_tel['Distance'], delta_time)
     ax[0].axhline(0, color='white')
@@ -1218,9 +1233,10 @@ def wall_of_plots(year, event_name, driver_1, driver_2, ses):
     ax[6].set(ylabel='DRS')
     ax[6].set(xlabel='Lap distance (meters)')
 
-    # space between plots
+    # Space between plots
     plt.subplots_adjust(hspace=0.3)
 
+    # Placeholder for additional plots
     # ax[7] = quali_results_concrete_wall(2023, "Bahrain", ax=ax[7])
     # ax[8] = compare_fastest_lap_visualization_on_map(quali, year, driver_1, driver_2, ses, ax=ax[8])
     # tyre_strategies_wall(quali, ax=ax[7])
@@ -1230,6 +1246,7 @@ def wall_of_plots(year, event_name, driver_1, driver_2, ses):
     # visualization_of_position_changes_during_the_race_wall(quali, ax=ax[9])
     # get_gained_positions_in_full_race_wall(quali, ax=ax[10])
     # get_gained_positions_on_first_lap_wall(quali, ax=ax[11])
+
     # Store figure
     plt.savefig(plot_filename, dpi=300)
 
@@ -1237,4 +1254,4 @@ def wall_of_plots(year, event_name, driver_1, driver_2, ses):
 
 
 if __name__ == '__main__':
-    wall_of_plots(2024, "Monaco", "VER", "LEC", "R")
+    wall_of_plots(2024, "Monaco", "ALO", "LEC", "R")
